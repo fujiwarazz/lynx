@@ -146,8 +146,6 @@ class CallTest extends TestBase {
 
   @Test
   def testRound(): Unit ={
-    var t = runOnDemoGraph(s"return round(3.141592) as value").records().next()("value")
-
     Assertions.assertEquals(LynxInteger(3), runOnDemoGraph(s"return round(3.141592) as value").records().next()("value"))
   }
   @Test
