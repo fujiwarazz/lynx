@@ -66,8 +66,9 @@ class CallTest extends TestBase {
 
   @Test
   def testSumEmpty(): Unit = {
+    // 查询错误结果应该是null 不是float(0)
     val rs = runOnDemoGraph("match (n:notexists) return sum(n.age)").records().next()("sum(n.age)")
-    Assertions.assertEquals(LynxFloat(0), rs)
+    Assertions.assertEquals(LynxNull, rs)
   }
 
   @Test
@@ -87,8 +88,9 @@ class CallTest extends TestBase {
     runOnDemoGraph("CREATE (:profile {works: duration('P18DT16H12M'), history: duration({years: 10.2, months: 5, days: 14, hours:16, minutes: 12})})")
     runOnDemoGraph("CREATE (:profile {works: duration('P10DT16H12M'), history: duration({seconds: 1, milliseconds: 123, microseconds: 456, nanoseconds: 789})})")
     val rs = runOnDemoGraph("match (n:profile) return avg(n.works), sum(n.history)").records().next()
-    Assertions.assertEquals(LynxDuration.parse("PT352H12M"), rs("avg(n.works)"))
-    Assertions.assertEquals(LynxDuration.parse("PT93304H12M1.123123725S"), rs("sum(n.history)"))
+    // 使用tostring否则在未重载equals时仍需比较地址
+    Assertions.assertEquals(LynxDuration.parse("P14DT16H12M").toString(), rs("avg(n.works)").toString)
+    Assertions.assertEquals(LynxDuration.parse("PT93304H12M1.123123725S").toString(), rs("sum(n.history)").toString)
   }
 
   @Test
@@ -144,6 +146,8 @@ class CallTest extends TestBase {
 
   @Test
   def testRound(): Unit ={
+    var t = runOnDemoGraph(s"return round(3.141592) as value").records().next()("value")
+
     Assertions.assertEquals(LynxInteger(3), runOnDemoGraph(s"return round(3.141592) as value").records().next()("value"))
   }
   @Test
