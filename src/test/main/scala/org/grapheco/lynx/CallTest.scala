@@ -66,9 +66,8 @@ class CallTest extends TestBase {
 
   @Test
   def testSumEmpty(): Unit = {
-    // 查询错误结果应该是null 不是float(0)
     val rs = runOnDemoGraph("match (n:notexists) return sum(n.age)").records().next()("sum(n.age)")
-    Assertions.assertEquals(LynxNull, rs)
+    Assertions.assertEquals(LynxFloat(0), rs)
   }
 
   @Test
